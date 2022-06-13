@@ -1,0 +1,40 @@
+[
+    {
+        "description": "We do not like his methods, but he gets the job done.",
+        "image": "/images/funtado.svg",
+        "name": "Funtado",
+        "attributes": [
+            {
+                "trait_type": "attack",
+                "value": "20"
+            },
+            {
+                "trait_type": "health",
+                "value": "100"
+            },
+            {
+                "trait_type": "speed",
+                "value": "30"
+            }
+        ]
+    },
+    {
+        "description": "Has not open a chest in a while ",
+        "image": "/images/farlitox.svg",
+        "name": "Farlitox",
+        "attributes": [
+            {
+                "trait_type": "attack",
+                "value": "40"
+            },
+            {
+                "trait_type": "health",
+                "value": "80"
+            },
+            {
+                "trait_type": "speed",
+                "value": "50"
+            }
+        ]
+    }
+]
