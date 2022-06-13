@@ -3,12 +3,12 @@
 import { Fragment } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { BellIcon, MenuIcon, XIcon } from '@heroicons/react/outline';
+import Link from 'next/link';
+import ActiveLink from '../link';
 
 const navigation = [
-    { name: 'Dashboard', href: '#', current: true },
-    { name: 'Team', href: '#', current: false },
-    { name: 'Projects', href: '#', current: false },
-    { name: 'Calendar', href: '#', current: false },
+    { name: 'Marketplace', href: '/', current: true },
+    { name: 'Create', href: '/nft/create', current: true },
 ];
 
 function classNames(...classes: string[]) {
@@ -52,23 +52,22 @@ export default function Navbar() {
                                 <div className="hidden sm:block sm:ml-6">
                                     <div className="flex space-x-4">
                                         {navigation.map((item) => (
-                                            <a
-                                                key={item.name}
+                                            <ActiveLink
                                                 href={item.href}
-                                                className={classNames(
-                                                    item.current
-                                                        ? 'bg-gray-900 text-white'
-                                                        : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                                                    'px-3 py-2 rounded-md text-sm font-medium'
-                                                )}
-                                                aria-current={
-                                                    item.current
-                                                        ? 'page'
-                                                        : undefined
-                                                }
+                                                key={item.name}
+                                                activeClass="bg-gray-900 text-white'"
                                             >
-                                                {item.name}
-                                            </a>
+                                                <a
+                                                    className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                                                    aria-current={
+                                                        item.current
+                                                            ? 'page'
+                                                            : undefined
+                                                    }
+                                                >
+                                                    {item.name}
+                                                </a>
+                                            </ActiveLink>
                                         ))}
                                     </div>
                                 </div>
@@ -88,7 +87,7 @@ export default function Navbar() {
                                 </button>
 
                                 {/* Profile dropdown */}
-                                <Menu as="div" className="ml-3 relative">
+                                <Menu as="div" className="ml-3 relative z-10">
                                     <div>
                                         <Menu.Button className="bg-gray-800 flex text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                                             <span className="sr-only">
@@ -113,47 +112,18 @@ export default function Navbar() {
                                         <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
                                             <Menu.Item>
                                                 {({ active }) => (
-                                                    <a
-                                                        href="#"
-                                                        className={classNames(
-                                                            active
-                                                                ? 'bg-gray-100'
-                                                                : '',
-                                                            'block px-4 py-2 text-sm text-gray-700'
-                                                        )}
-                                                    >
-                                                        Your Profile
-                                                    </a>
-                                                )}
-                                            </Menu.Item>
-                                            <Menu.Item>
-                                                {({ active }) => (
-                                                    <a
-                                                        href="#"
-                                                        className={classNames(
-                                                            active
-                                                                ? 'bg-gray-100'
-                                                                : '',
-                                                            'block px-4 py-2 text-sm text-gray-700'
-                                                        )}
-                                                    >
-                                                        Settings
-                                                    </a>
-                                                )}
-                                            </Menu.Item>
-                                            <Menu.Item>
-                                                {({ active }) => (
-                                                    <a
-                                                        href="#"
-                                                        className={classNames(
-                                                            active
-                                                                ? 'bg-gray-100'
-                                                                : '',
-                                                            'block px-4 py-2 text-sm text-gray-700'
-                                                        )}
-                                                    >
-                                                        Sign out
-                                                    </a>
+                                                    <Link href="/profile">
+                                                        <a
+                                                            className={classNames(
+                                                                active
+                                                                    ? 'bg-gray-100'
+                                                                    : '',
+                                                                'block px-4 py-2 text-sm text-gray-700'
+                                                            )}
+                                                        >
+                                                            Your Profile
+                                                        </a>
+                                                    </Link>
                                                 )}
                                             </Menu.Item>
                                         </Menu.Items>
