@@ -1,20 +1,20 @@
 /* eslint-disable @next/next/no-img-element */
 import { FunctionComponent } from 'react';
-import { NftMetaData } from '../../../types/nft';
+import { NftMetaData } from '../../../../types/nft';
 type NftItemProps = {
     item: NftMetaData;
 };
 const NftItem: FunctionComponent<NftItemProps> = ({ item }) => {
     return (
         <>
-            <div className="flex-shrink-0   ">
+            <div className="flex-shrink-0  p-8   ">
                 <img
                     className={`h-full w-full object-cover`}
                     src={item.image}
                     alt="New NFT"
                 />
             </div>
-            <div className="flex-1 bg-white p-6 flex flex-col justify-between rounded-lg  shadow-lg  ">
+            <div className="flex-1 bg-white p-8 flex flex-col justify-between ">
                 <div className="flex-1">
                     <p className="text-sm font-medium text-indigo-600">
                         Creatures NFT
