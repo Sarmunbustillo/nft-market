@@ -1,6 +1,11 @@
 import { MetaMaskInpageProvider } from '@metamask/providers';
 import { Contract, providers } from 'ethers';
-import { truncate } from 'fs';
+
+declare global {
+    interface Window {
+        ethereum: MetaMaskInpageProvider;
+    }
+}
 
 export type Web3Params = {
     ethereum: MetaMaskInpageProvider | null;
