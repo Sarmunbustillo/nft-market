@@ -1,8 +1,10 @@
 import { Web3Dependencies } from '@_types/hooks';
 import { hookFactory as createAccountHook, UseAccountHook } from './useAccount';
+import { hookFactory as createNetworkHook, UseNetworkHook } from './useNetwork';
 
 export type Web3Hooks = {
     useAccount: UseAccountHook;
+    useNetwork: UseNetworkHook;
 };
 
 export type SetupHooks = {
@@ -12,5 +14,6 @@ export type SetupHooks = {
 export const SetupHooks: SetupHooks = (dependencies) => {
     return {
         useAccount: createAccountHook(dependencies),
+        useNetwork: createNetworkHook(dependencies),
     };
 };
