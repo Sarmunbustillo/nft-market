@@ -6,10 +6,30 @@ import {
     Web3State,
 } from '@providers/web3/utils';
 import { ethers } from 'ethers';
+import { MetaMaskInpageProvider } from '@metamask/providers';
 
 interface Props {
     children: React.ReactNode;
 }
+
+const pageReload = () => window.location.reload();
+const handleAccount = (ethereum: MetaMaskInpageProvider) => async () => {
+    // isUnlocked returns true if the user is logged out, so we convert that true to a false
+    const isLocked = !(await ethereum._metamask.isUnlocked());
+
+    if (isLocked) {
+        pageReload();
+    }
+};
+
+const setGlobalListeners = (ethereum: MetaMaskInpageProvider) => {
+    ethereum.on('chainChanged', pageReload);
+    ethereum.on('accountsChanged', handleAccount(ethereum));
+};
+const removeGlobalListeners = (ethereum: MetaMaskInpageProvider) => {
+    ethereum?.removeListener('chainChanged', pageReload);
+    ethereum?.removeListener('accountsChanged', handleAccount);
+};
 
 const Web3Context = createContext<Web3State>(createDefaultState());
 
@@ -23,6 +43,7 @@ const Web3Provider: React.FC<Props> = ({ children }) => {
                     window.ethereum as any
                 );
                 const contract = await loadContract('NftMarket', provider);
+                setGlobalListeners(window.ethereum);
 
                 setWeb3Api(
                     createweb3State({
@@ -44,7 +65,7 @@ const Web3Provider: React.FC<Props> = ({ children }) => {
         }
 
         iniWeb3();
-        return () => {};
+        return () => removeGlobalListeners(window.ethereum);
     }, []);
 
     return (

@@ -18,6 +18,7 @@ function classNames(...classes: string[]) {
 export default function Navbar() {
     const { account } = useAccount();
     const { network } = useNetwork();
+
     return (
         <Disclosure as="nav" className="bg-gray-800">
             {({ open }) => (
@@ -84,9 +85,11 @@ export default function Navbar() {
                                         >
                                             <circle cx={4} cy={4} r={3} />
                                         </svg>
-                                        {network.data} ---{' '}
-                                        {`Is Supported: ${network.isSupported}`}{' '}
-                                        --- Target: {network.targetNetwork}
+                                        {network.isLoading
+                                            ? 'Loading...'
+                                            : account.isInstalled
+                                            ? network.data
+                                            : 'Install Web3 Wallet'}
                                     </span>
                                 </div>
                                 <Walletbar

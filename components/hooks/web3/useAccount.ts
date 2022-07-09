@@ -26,7 +26,7 @@ export const hookFactory: AccountHookFactory =
                 }
                 return account;
             },
-            { revalidateOnFocus: false }
+            { revalidateOnFocus: false, shouldRetryOnError: false }
         );
 
         useEffect((): any => {
@@ -59,7 +59,7 @@ export const hookFactory: AccountHookFactory =
             ...swr,
             data,
             isValidating,
-            isLoading: isLoading || isValidating,
+            isLoading: isLoading as boolean,
             isInstalled: ethereum?.isMetaMask || false,
             mutate,
             connect,
