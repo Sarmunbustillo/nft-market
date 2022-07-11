@@ -4,37 +4,90 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/counters.sol";
 
 contract NftMarket is ERC721URIStorage {
-    using Counters for Counters.Counter;
+  using Counters for Counters.Counter;
 
-    struct NftItem {
-      uint tokenId;
-      uint price;
-      address creator;
-      bool isListed;
+  struct NftItem {
+    uint tokenId;
+    uint price;
+    address creator;
+    bool isListed;
+  }
+
+  uint public listingPrice = 0.025 ether;
+
+  Counters.Counter private _listedItems;
+  Counters.Counter private _tokenIds;
+
+  // all tokens in the array
+  uint256[] private _allNfts;
+
+  mapping(string => bool) private _usedTokenURIs;
+  mapping(uint => NftItem) private _idToNftItem;
+
+  mapping(uint => uint) private _idToNftIndex;
+
+  event NftItemCreated (
+    uint tokenId,
+    uint price,
+    address creator,
+    bool isListed
+  );
+
+  constructor() ERC721("PlayersNFT", "PNFT") {}
+
+
+  function getNftItem(uint tokenId) public view returns(NftItem memory) {
+    return _idToNftItem[tokenId];
+  }
+
+  function listedItemsCount() public view returns (uint) {
+    return _listedItems.current();
+  }
+
+  function tokenURIExists(string memory tokenURI) public view returns (bool) {
+    return _usedTokenURIs[tokenURI] == true;
+  }
+
+  function totalSupply() public view returns (uint) {
+    return _allNfts.length;
+  }
+
+  function tokenByIndex(uint index) public view returns (uint) {
+    // check that index exist on all nfts
+    require(index <  totalSupply(), "Index out of bounds");
+    return _allNfts[index];
+  }
+
+
+  function getAllNftsOnSale() public view returns (NftItem[] memory) {
+    uint allItemsCounts = totalSupply();
+    uint currentIndex = 0;
+    // create an array nft items with the length of the already listed items
+    NftItem[] memory items = new NftItem[](_listedItems.current());
+
+    // for all items
+    for (uint i = 0; i < allItemsCounts; i++) {
+      uint tokenId = tokenByIndex(i);
+      // get item by id
+      NftItem storage item = _idToNftItem[tokenId];
+
+      // if the item is listed
+      if (item.isListed == true) {
+        items[currentIndex] = item;
+        currentIndex += 1;
+      }
     }
 
-    uint public listingPrice = 0.025 ether;
+    return items;
+  }
 
-    Counters.Counter private _listedItems;
-    Counters.Counter private _tokenIds;
+   
 
-    mapping(string => bool) private _usedTokenURIs;
-    mapping(uint => NftItem) private _idToNftItem;
-
-    event NftItemCreated (
-      uint tokenId,
-      uint price,
-      address creator,
-      bool isListed
-    );
-
-    constructor() ERC721("PlayersNFT", "PNFT") {}
 
   function mintToken(string memory tokenURI, uint price) public payable returns (uint) {
     require(!tokenURIExists(tokenURI), "TokenURI already exists");
     require(msg.value == listingPrice, "Price must be equal to listing price"
     );
-
 
     _tokenIds.increment();
     _listedItems.increment();
@@ -54,10 +107,11 @@ contract NftMarket is ERC721URIStorage {
   ) public payable {
     uint price = _idToNftItem[tokenId].price;
     address owner = ERC721.ownerOf(tokenId);
-    
+
     require(msg.sender != owner, "You already own this NFT");
     require(msg.value == price, "Please submit the asking price");
 
+    // remove item from lising
     _idToNftItem[tokenId].isListed = false;
     _listedItems.decrement();
 
@@ -86,15 +140,22 @@ contract NftMarket is ERC721URIStorage {
     );
   }
 
-  function getNftItem(uint tokenId) public view returns(NftItem memory) {
-    return _idToNftItem[tokenId];
+  function _beforeTokenTransfer(address from, address to, uint tokenId) internal virtual override {
+    super._beforeTokenTransfer(from, to, tokenId);
+
+    // minting token
+    if(from == address(0)) {
+      _addTokenToAllTokensEnumaration(tokenId);
+    }
+
+
   }
 
-  function listedItemsCount() public view returns (uint) {
-    return _listedItems.current();
-  }
-
-  function tokenURIExists(string memory tokenURI) public view returns (bool) {
-    return _usedTokenURIs[tokenURI] == true;
+  function _addTokenToAllTokensEnumaration(uint tokenId) private {
+    // ex: [tokenID => _allNfts.length] maps id to array's length
+    // first iteration: --> [1 => 0] = [1]
+    // second iteration  [1 => 0, 2 => 1 ] = [1, 2].
+    _idToNftIndex[tokenId] = _allNfts.length;
+    _allNfts.push(tokenId);
   }
 }

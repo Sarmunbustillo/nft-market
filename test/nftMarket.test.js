@@ -10,7 +10,10 @@ contract('NftMarket', (accounts) => {
         _contract = await NftMarket.deployed();
     });
 
+    // test minting
     describe('Mint token', () => {
+        // mock create nft
+        // test nfts count 1
         const tokenURI = 'https://test.com';
         before(async () => {
             await _contract.mintToken(tokenURI, _nftPrice, {
@@ -67,7 +70,10 @@ contract('NftMarket', (accounts) => {
         });
     });
 
+    // test buy
+
     describe('Buy NFT', () => {
+        // test nfts count 1, but removed from the sale list
         before(async () => {
             await _contract.buyNft(1, {
                 from: accounts[1],
@@ -94,6 +100,40 @@ contract('NftMarket', (accounts) => {
                 accounts[1],
                 'owner and buyer are the same account'
             );
+        });
+    });
+
+    describe('Token transfres', () => {
+        // mock create nft
+        // test nfts count 2
+        const tokenURI = 'hettps://test-json-2.com';
+        before(async () => {
+            await _contract.mintToken(tokenURI, _nftPrice, {
+                from: accounts[0],
+                value: _listingPrice,
+            });
+        });
+
+        it('should have two NFTs created', async () => {
+            const totalSupply = await _contract.totalSupply();
+            assert.equal(
+                totalSupply.toNumber(),
+                2,
+                'Total supply of tokens is not correct'
+            );
+        });
+
+        it('should be able to retireve NFT by index', async () => {
+            const nftId1 = await _contract.tokenByIndex(0);
+            const nftId2 = await _contract.tokenByIndex(1);
+            assert.equal(nftId1.toNumber(), 1, 'NFT id should be 1');
+            assert.equal(nftId2.toNumber(), 2, 'NFT id should be 2');
+        });
+
+        // bought nft in previous buy test
+        it('should only be one listed nft with id of 2', async () => {
+            const allNfts = await _contract.getAllNftsOnSale();
+            assert.equal(allNfts[0].tokenId, 2, 'Bft has wrong id');
         });
     });
 });

@@ -1,5 +1,5 @@
 NFT market place app
 
-Using React, Nextjs, Ganash, truffle,
+Using React, Nextjs, Typescript, Ganash, truffle
 
-Test: You need to install Ganash local blockchain enviroment
+Testing: You need to install Ganash and truffle for local blockchain enviroment
