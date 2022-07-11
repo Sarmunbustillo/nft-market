@@ -103,6 +103,10 @@ contract NftMarket is ERC721URIStorage {
     return items;
   }
 
+  function burnToken(uint tokenId) public {
+    _burn(tokenId);
+  }
+
   // creation of token 
   function mintToken(string memory tokenURI, uint price) public payable returns (uint) {
     require(!tokenURIExists(tokenURI), "TokenURI already exists");
@@ -166,16 +170,18 @@ contract NftMarket is ERC721URIStorage {
     // minting/creating token 
     if(from == address(0)) {
       _addTokenToAllTokensEnumeration(tokenId);
-    } 
-    // remove ownership if owner/seller is not the same user/buyer it
+    }  // remove ownership if owner/seller is not the same user/buyer it
     else if (from != to) {
       _removeTokenFromOwnerEnumeration(from, tokenId);
-    }
+    } 
 
-    // add token to buyer if owner/seller is not the same user/buyer it
-    if (to != from) {
+    if(to == address(0)) {
+      _removeTokenFromAllTokensEnumeration(tokenId);
+    } // add token to buyer if owner/seller is not the same user/buyer it
+    else if (to != from) {
       _addTokenToOwnerEnumeration(to, tokenId);
     }
+
   }
 
   function _addTokenToAllTokensEnumeration(uint tokenId) private {
@@ -212,5 +218,18 @@ contract NftMarket is ERC721URIStorage {
 
     delete _idToOwnedIndex[tokenId]; // delete the index mapping to the token in trade from the previous owner
     delete _ownedTokens[from][lastTokenIndex]; // delete the token in trade from the previous owner
+  }
+
+  //similar to function above
+  function _removeTokenFromAllTokensEnumeration(uint tokenId) private {
+    uint lastTokenIndex = _allNfts.length - 1; // get the index of the last token
+    uint tokenIndex = _idToNftIndex[tokenId]; // get the index of the traded token 
+    uint lastTokenId = _allNfts[lastTokenIndex]; // get the id of the las token
+
+    _allNfts[tokenIndex] = lastTokenId; //replace the id of the traded token to the last token id
+    _idToNftIndex[lastTokenId] = tokenIndex; // replace the index of the last token to the traded token
+
+    delete _idToNftIndex[tokenId]; // delete index of traded token
+    _allNfts.pop(); // delete last token
   }
 }

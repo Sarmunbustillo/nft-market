@@ -58,7 +58,7 @@ contract('NftMarket', (accounts) => {
         });
         it('should create NFT item', async () => {
             const nftItem = await _contract.getNftItem(1);
-            console.log(nftItem);
+            // console.log(nftItem);
             assert.equal(nftItem.tokenId, 1, 'token id is not 1');
             assert.equal(nftItem.price, _nftPrice, 'Nft price is not correct ');
             assert.equal(
@@ -180,6 +180,35 @@ contract('NftMarket', (accounts) => {
                 from: accounts[1],
             });
             assert.equal(ownedNfts.length, 2, 'account should own 2 tokens');
+        });
+    });
+
+    describe('Burn Token', () => {
+        // mock create nft
+        // test nfts count 3
+        const tokenURI = 'https://test-json3.com';
+        before(async () => {
+            await _contract.mintToken(tokenURI, _nftPrice, {
+                from: accounts[2],
+                value: _listingPrice,
+            });
+        });
+
+        it('account[2] should have one owned NFT', async () => {
+            const ownedNfts = await _contract.getOwnedNfts({
+                from: accounts[2],
+            });
+
+            assert.equal(ownedNfts[0].tokenId, 3, 'Nft has a wrong id');
+        });
+
+        it('account[2] should own 0 NFTs', async () => {
+            await _contract.burnToken(3, { from: accounts[2] });
+            const ownedNfts = await _contract.getOwnedNfts({
+                from: accounts[2],
+            });
+
+            assert.equal(ownedNfts.length, 0, 'Invalid length of tokens');
         });
     });
 });
