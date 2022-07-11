@@ -103,7 +103,7 @@ contract NftMarket is ERC721URIStorage {
     return items;
   }
 
-
+  // creation of token 
   function mintToken(string memory tokenURI, uint price) public payable returns (uint) {
     require(!tokenURIExists(tokenURI), "TokenURI already exists");
     require(msg.value == listingPrice, "Price must be equal to listing price"
@@ -163,16 +163,19 @@ contract NftMarket is ERC721URIStorage {
   function _beforeTokenTransfer(address from, address to, uint tokenId) internal virtual override {
     super._beforeTokenTransfer(from, to, tokenId);
 
-    // minting token
+    // minting/creating token 
     if(from == address(0)) {
       _addTokenToAllTokensEnumeration(tokenId);
+    } 
+    // remove ownership if owner/seller is not the same user/buyer it
+    else if (from != to) {
+      _removeTokenFromOwnerEnumeration(from, tokenId);
     }
 
-    // if owner/seller is not the same user/buyer it
+    // add token to buyer if owner/seller is not the same user/buyer it
     if (to != from) {
       _addTokenToOwnerEnumeration(to, tokenId);
     }
-
   }
 
   function _addTokenToAllTokensEnumeration(uint tokenId) private {
@@ -189,5 +192,25 @@ contract NftMarket is ERC721URIStorage {
 
     _ownedTokens[to][length] = tokenId; // user addresss => 0 => 1
     _idToOwnedIndex[tokenId] = length;  // 1 => 0 
+  }
+
+  // removes and updates mapping of tokens to owner 
+  function _removeTokenFromOwnerEnumeration(address from, uint tokenId) private {
+    // ex: _ownedTokens: {token1: 0, token2: 1, token3: 2},  _idToOwnedIndex: {0:token1, 1: token2, 2: token3}
+    // if tokenId = token2 then 
+    // result: _ownedTokens: {token1: 0, token3: 1},  _idToOwnedIndex: {0: token1, 1: token3}
+    uint lastTokenIndex = ERC721.balanceOf(from) - 1; // get last index of tokens owned
+    uint tokenIndex = _idToOwnedIndex[tokenId]; // get the index of the desired token in trade
+
+    if(tokenIndex != lastTokenIndex) { // if the token in trade does not happen to be the last token/index in the array
+      uint lastTokenId = _ownedTokens[from][lastTokenIndex]; // get the id from the last token owned
+
+      // remapping to update values and positions
+      _ownedTokens[from][tokenIndex] = lastTokenId; // replace the index of the traded token to the last token id
+      _idToOwnedIndex[lastTokenId] = tokenIndex; // replace the id of last token to the traded token
+    }
+
+    delete _idToOwnedIndex[tokenId]; // delete the index mapping to the token in trade from the previous owner
+    delete _ownedTokens[from][lastTokenIndex]; // delete the token in trade from the previous owner
   }
 }

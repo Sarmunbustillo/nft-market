@@ -103,7 +103,7 @@ contract('NftMarket', (accounts) => {
         });
     });
 
-    describe('Token transfres', () => {
+    describe('Token transfers', () => {
         // mock create nft
         // test nfts count 2
         const tokenURI = 'hettps://test-json-2.com';
@@ -156,6 +156,30 @@ contract('NftMarket', (accounts) => {
                 2,
                 'account does not own that nft'
             );
+        });
+    });
+
+    describe('Token transfers to new owner', () => {
+        before(async () => {
+            await _contract.transferFrom(accounts[0], accounts[1], 2);
+        });
+
+        it('account[0] should own 0 tokens', async () => {
+            const ownedNfts = await _contract.getOwnedNfts({
+                from: accounts[0],
+            });
+            assert.equal(
+                ownedNfts.length,
+                0,
+                'account should not have any tokens'
+            );
+        });
+
+        it('account[0] should own 0 tokens', async () => {
+            const ownedNfts = await _contract.getOwnedNfts({
+                from: accounts[1],
+            });
+            assert.equal(ownedNfts.length, 2, 'account should own 2 tokens');
         });
     });
 });
