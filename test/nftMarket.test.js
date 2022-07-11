@@ -133,7 +133,29 @@ contract('NftMarket', (accounts) => {
         // bought nft with id 1 in previous buy test, so it should be unlisted
         it('should only be one listed nft with id of 2', async () => {
             const allNfts = await _contract.getAllNftsOnSale();
-            assert.equal(allNfts[0].tokenId, 2, 'Bft has wrong id');
+            assert.equal(allNfts[0].tokenId, 2, 'Nft has wrong id');
+        });
+
+        it('account[1] should have 1 nft', async () => {
+            const ownedNfts = await _contract.getOwnedNfts({
+                from: accounts[1],
+            });
+            assert.equal(
+                ownedNfts[0].tokenId,
+                1,
+                'account does not own that nft'
+            );
+        });
+
+        it('account[0] should have 1 nft', async () => {
+            const ownedNfts = await _contract.getOwnedNfts({
+                from: accounts[0],
+            });
+            assert.equal(
+                ownedNfts[0].tokenId,
+                2,
+                'account does not own that nft'
+            );
         });
     });
 });

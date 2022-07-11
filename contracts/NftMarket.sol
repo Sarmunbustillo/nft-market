@@ -18,12 +18,16 @@ contract NftMarket is ERC721URIStorage {
   Counters.Counter private _listedItems;
   Counters.Counter private _tokenIds;
 
-  // all tokens in the array
-  uint256[] private _allNfts;
 
   mapping(string => bool) private _usedTokenURIs;
   mapping(uint => NftItem) private _idToNftItem;
 
+  // mapping of address user to mapping of current index to tokenId
+  mapping(address => mapping(uint => uint)) private _ownedTokens;
+  mapping(uint =>uint) private _idToOwnedIndex;
+
+  // all tokens in the array
+  uint256[] private _allNfts;
   mapping(uint => uint) private _idToNftIndex;
 
   event NftItemCreated (
@@ -58,6 +62,11 @@ contract NftMarket is ERC721URIStorage {
     return _allNfts[index];
   }
 
+  function tokenOfOwnerByIndex(address owner, uint index) public view returns (uint) {
+    // check that index exist on all nfts
+    require(index <  ERC721.balanceOf(owner), "Index out of bounds");
+    return _ownedTokens[owner][index];
+  }
 
   function getAllNftsOnSale() public view returns (NftItem[] memory) {
     uint allItemsCounts = totalSupply();
@@ -81,7 +90,18 @@ contract NftMarket is ERC721URIStorage {
     return items;
   }
 
-   
+  function getOwnedNfts() public view returns (NftItem[] memory) {
+    uint ownedItemsCount = ERC721.balanceOf(msg.sender);
+    NftItem[] memory items = new NftItem[](ownedItemsCount);
+
+    for (uint i = 0; i < ownedItemsCount; i++) {
+      uint tokenId = tokenOfOwnerByIndex(msg.sender, i);
+      NftItem storage item = _idToNftItem[tokenId];
+      items[i] = item;
+    }
+
+    return items;
+  }
 
 
   function mintToken(string memory tokenURI, uint price) public payable returns (uint) {
@@ -145,17 +165,29 @@ contract NftMarket is ERC721URIStorage {
 
     // minting token
     if(from == address(0)) {
-      _addTokenToAllTokensEnumaration(tokenId);
+      _addTokenToAllTokensEnumeration(tokenId);
     }
 
+    // if owner/seller is not the same user/buyer it
+    if (to != from) {
+      _addTokenToOwnerEnumeration(to, tokenId);
+    }
 
   }
 
-  function _addTokenToAllTokensEnumaration(uint tokenId) private {
+  function _addTokenToAllTokensEnumeration(uint tokenId) private {
     // ex: [tokenID => _allNfts.length] maps id to array's length
     // first iteration: --> [1 => 0] = [1]
     // second iteration  [1 => 0, 2 => 1 ] = [1, 2].
     _idToNftIndex[tokenId] = _allNfts.length;
     _allNfts.push(tokenId);
+  }
+
+  function _addTokenToOwnerEnumeration(address to,  uint tokenId) private {
+    // gets tokens owned by user
+    uint length = ERC721.balanceOf(to); // if user has 0 tokens then length = 0
+
+    _ownedTokens[to][length] = tokenId; // user addresss => 0 => 1
+    _idToOwnedIndex[tokenId] = length;  // 1 => 0 
   }
 }
