@@ -1,0 +1,19 @@
+{
+    "description": "Has not open a chest in a while ",
+    "image": "https://gateway.pinata.cloud/ipfs/Qmchvr9GNM7RznEzCRsbUgeFvdvyAnLM7fAHUcCDwkKDQo",
+    "name": "Farlitox",
+    "attributes": [
+        {
+            "trait_type": "attack",
+            "value": "40"
+        },
+        {
+            "trait_type": "health",
+            "value": "80"
+        },
+        {
+            "trait_type": "speed",
+            "value": "50"
+        }
+    ]
+}
