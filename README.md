@@ -4,7 +4,7 @@ Buy, sell and transfer Nfts
 
 ## Tech
 
-Using React, Nextjs, Typescript, Ganache, Truffle, Pinata nft cloud
+React, Nextjs, Typescript, Tailwind, Ganache, Truffle, Pinata nft cloud
 
 ## Development
 
