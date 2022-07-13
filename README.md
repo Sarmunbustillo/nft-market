@@ -1,9 +1,21 @@
-NFT market place app
+# NFT market place app
 
-Using React, Nextjs, Typescript, Ganash, Truffle, Pinata nft cloud
+Buy, sell and transfer Nfts
 
-Testing: You need to install Ganash and truffle for local blockchain enviroment
+## Tech
 
-Run sudo truffle migrate --reset to upload contracts to ganache
+Using React, Nextjs, Typescript, Ganache, Truffle, Pinata nft cloud
 
-Run sudo truffle console to enter the truffle console to run commands
+## Development
+
+You need to install Ganache and Truffle for blockchain enviroment (and have Ganache open) (default account is always the first one accounts[0])
+
+you can import a Ganache account **private key** into your metaMask for testing
+
+Run `sudo truffle migrate --reset` to upload contracts to Ganache
+
+Run `sudo truffle console` to enter the truffle console to run commands
+
+Run `sudo truffle test` for testing
+
+Run `pnpm run genContractType` to generate contract types

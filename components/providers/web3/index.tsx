@@ -7,6 +7,7 @@ import {
 } from '@providers/web3/utils';
 import { ethers } from 'ethers';
 import { MetaMaskInpageProvider } from '@metamask/providers';
+import { NftMarketContract } from '@_types/nftMarketContract';
 
 interface Props {
     children: React.ReactNode;
@@ -43,13 +44,19 @@ const Web3Provider: React.FC<Props> = ({ children }) => {
                     window.ethereum as any
                 );
                 const contract = await loadContract('NftMarket', provider);
+
+                //sign contract
+                const signer = provider.getSigner();
+                const signedContract = contract.connect(signer);
+
                 setGlobalListeners(window.ethereum);
 
                 setWeb3Api(
                     createweb3State({
                         ethereum: window.ethereum,
                         provider,
-                        contract,
+                        contract:
+                            signedContract as unknown as NftMarketContract,
                         isLoading: false,
                     })
                 );
