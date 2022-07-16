@@ -49,7 +49,9 @@ const Web3Provider: React.FC<Props> = ({ children }) => {
                 const signer = provider.getSigner();
                 const signedContract = contract.connect(signer);
 
-                setGlobalListeners(window.ethereum);
+                setTimeout(() => {
+                    setGlobalListeners(window.ethereum);
+                }, 100);
 
                 setWeb3Api(
                     createweb3State({
