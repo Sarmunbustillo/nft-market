@@ -2,16 +2,18 @@
 
 import type { NextPage } from 'next';
 import { ChangeEvent, useState } from 'react';
-import { BaseLayout } from '../../components/ui';
+import { BaseLayout } from '@ui';
 import { Switch } from '@headlessui/react';
 import Link from 'next/link';
-import { NftMetaData } from '@_types/nft';
+import { NftMeta } from '@_types/nft';
 import axios from 'axios';
+import { useWeb3 } from '@providers/web3';
 
 const NftCreate: NextPage = () => {
+    const { ethereum } = useWeb3();
     const [nftURI, setNftURI] = useState('');
     const [hasURI, setHasURI] = useState(false);
-    const [nftMeta, setNftMeta] = useState<NftMetaData>({
+    const [nftMeta, setNftMeta] = useState<NftMeta>({
         name: '',
         description: '',
         image: '',
@@ -29,27 +31,48 @@ const NftCreate: NextPage = () => {
         setNftMeta({ ...nftMeta, [name]: value });
     };
 
-    const createNft = async () => {
-        try {
-            const messageToSign = await axios.get('/api/verify');
-            // console.log(messageToSign.data);
-        } catch (e: any) {
-            console.error(e.message);
-        }
-    };
-
     const handleAttributeChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        const attributeIndex = nftMeta.attributes.findIndex(
+        const attributeIdx = nftMeta.attributes.findIndex(
             (attr) => attr.trait_type === name
         );
 
-        nftMeta.attributes[attributeIndex].value = value;
+        nftMeta.attributes[attributeIdx].value = value;
         setNftMeta({
             ...nftMeta,
             attributes: nftMeta.attributes,
         });
     };
+
+    const createNft = async () => {
+        try {
+            const messageToSign = await axios.get('/api/verify');
+            const accounts = (await ethereum?.request({
+                method: 'eth_requestAccounts',
+            })) as string[];
+            const account = accounts[0];
+
+            const signedData = await ethereum?.request({
+                method: 'personal_sign',
+                params: [
+                    JSON.stringify(messageToSign.data),
+                    account,
+                    messageToSign.data.id,
+                ],
+            });
+
+            await axios.post('/api/verify', {
+                address: account,
+                signature: signedData,
+                nft: nftMeta,
+            });
+
+            console.log(signedData);
+        } catch (e: any) {
+            console.error(e.message);
+        }
+    };
+
     return (
         <BaseLayout>
             <div>
@@ -63,7 +86,7 @@ const NftCreate: NextPage = () => {
                                 checked={hasURI}
                                 onChange={() => setHasURI(!hasURI)}
                                 className={`${
-                                    hasURI ? 'bg-indigo-900' : 'bg-indigo-300'
+                                    hasURI ? 'bg-indigo-900' : 'bg-indigo-700'
                                 }
                   relative inline-flex flex-shrink-0 h-[28px] w-[64px] border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
                             >
@@ -147,8 +170,6 @@ const NftCreate: NextPage = () => {
                                             </label>
                                             <div className="mt-1 flex rounded-md shadow-sm">
                                                 <input
-                                                    value={nftMeta.name}
-                                                    onChange={handleChange}
                                                     type="number"
                                                     name="price"
                                                     id="price"
@@ -196,6 +217,8 @@ const NftCreate: NextPage = () => {
                                             </label>
                                             <div className="mt-1 flex rounded-md shadow-sm">
                                                 <input
+                                                    value={nftMeta.name}
+                                                    onChange={handleChange}
                                                     type="text"
                                                     name="name"
                                                     id="name"
@@ -236,7 +259,7 @@ const NftCreate: NextPage = () => {
                                         ) : (
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700">
-                                                    NFT image
+                                                    Image
                                                 </label>
                                                 <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
                                                     <div className="space-y-1 text-center">
@@ -297,7 +320,9 @@ const NftCreate: NextPage = () => {
                                                             }
                                                             className="block text-sm font-medium text-gray-700"
                                                         >
-                                                            {attribute.value}
+                                                            {
+                                                                attribute.trait_type
+                                                            }
                                                         </label>
                                                         <input
                                                             onChange={

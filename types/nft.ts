@@ -5,7 +5,7 @@ export type NftAttribute = {
     value: string;
 };
 
-export type NftMetaData = {
+export type NftMeta = {
     name: string;
     description: string;
     image: string;
@@ -20,5 +20,5 @@ export type NftCore = {
 };
 
 export type Nft = {
-    meta: NftMetaData;
+    meta: NftMeta;
 } & NftCore;
