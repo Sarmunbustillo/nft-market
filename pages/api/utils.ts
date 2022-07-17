@@ -12,6 +12,9 @@ const NETWORKS = {
 type NETWORK = typeof NETWORKS;
 const targetNetwork = process.env.NEXT_PUBLIC_NETWORK_ID as keyof NETWORK;
 
+export const pinataApiKey = process.env.PINATA_API_KEY as string;
+export const pinataSecretApiKey = process.env.PINATA_SECRET_API_KEY as string;
+
 const abi = contract.abi;
 
 export const contractAddress = contract['networks'][targetNetwork]['address'];
@@ -52,9 +55,7 @@ export const addressCheckMiddleware = (
             JSON.stringify(message);
 
         // console.log(nonce);
-
         nonce = util.keccak(Buffer.from(nonce, 'utf-8'));
-
         const { v, r, s } = util.fromRpcSig(req.body.signature);
         const pubKey = util.ecrecover(util.toBuffer(nonce), v, r, s);
         const addrBuffer = util.pubToAddress(pubKey);

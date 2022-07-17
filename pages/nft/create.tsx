@@ -5,7 +5,7 @@ import { ChangeEvent, useState } from 'react';
 import { BaseLayout } from '@ui';
 import { Switch } from '@headlessui/react';
 import Link from 'next/link';
-import { NftMeta } from '@_types/nft';
+import { NftMeta, PinataRes } from '@_types/nft';
 import axios from 'axios';
 import { useWeb3 } from '@providers/web3';
 
@@ -23,6 +23,60 @@ const NftCreate: NextPage = () => {
             { trait_type: 'speed', value: '0' },
         ],
     });
+
+    const getSignedData = async () => {
+        const messageToSign = await axios.get('/api/verify');
+        const accounts = (await ethereum?.request({
+            method: 'eth_requestAccounts',
+        })) as string[];
+        const account = accounts[0];
+
+        const signedData = await ethereum?.request({
+            method: 'personal_sign',
+            params: [
+                JSON.stringify(messageToSign.data),
+                account,
+                messageToSign.data.id,
+            ],
+        });
+
+        return {
+            signedData,
+            account,
+        };
+    };
+
+    const handleImage = async (e: ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files || e.target.files.length < 1) {
+            console.error('Select a file');
+            return;
+        }
+
+        const file = e.target.files[0];
+        const buffer = await file.arrayBuffer();
+        const bytes = new Uint8Array(buffer);
+
+        try {
+            const { signedData, account } = await getSignedData();
+
+            const res = await axios.post('/api/verify-image', {
+                address: account,
+                signature: signedData,
+                bytes,
+                contentType: file.type,
+                fileName: file.name.replace(/\.[^/.]+$/, ''),
+            });
+
+            const data = res.data as PinataRes;
+
+            setNftMeta({
+                ...nftMeta,
+                image: `${process.env.NEXT_PUBLIC_PINATA_DOMAIN}/ipfs/${data.IpfsHash}`,
+            });
+        } catch (error: any) {
+            console.log(error.message);
+        }
+    };
 
     const handleChange = (
         e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -46,20 +100,7 @@ const NftCreate: NextPage = () => {
 
     const createNft = async () => {
         try {
-            const messageToSign = await axios.get('/api/verify');
-            const accounts = (await ethereum?.request({
-                method: 'eth_requestAccounts',
-            })) as string[];
-            const account = accounts[0];
-
-            const signedData = await ethereum?.request({
-                method: 'personal_sign',
-                params: [
-                    JSON.stringify(messageToSign.data),
-                    account,
-                    messageToSign.data.id,
-                ],
-            });
+            const { signedData, account } = await getSignedData();
 
             await axios.post('/api/verify', {
                 address: account,
@@ -67,7 +108,7 @@ const NftCreate: NextPage = () => {
                 nft: nftMeta,
             });
 
-            console.log(signedData);
+            // console.log(signedData);
         } catch (e: any) {
             console.error(e.message);
         }
@@ -250,10 +291,10 @@ const NftCreate: NextPage = () => {
                                             </p>
                                         </div>
                                         {/* Has Image? */}
-                                        {false ? (
+                                        {nftMeta.image ? (
                                             <img
-                                                src="https://eincode.mypinata.cloud/ipfs/QmaQYCrX9Fg2kGijqapTYgpMXV7QPPzMwGrSRfV9TvTsfM/Creature_1.png"
-                                                alt=""
+                                                src={nftMeta.image}
+                                                alt={nftMeta.name}
                                                 className="h-40"
                                             />
                                         ) : (
@@ -287,6 +328,9 @@ const NftCreate: NextPage = () => {
                                                                     file
                                                                 </span>
                                                                 <input
+                                                                    onChange={
+                                                                        handleImage
+                                                                    }
                                                                     id="file-upload"
                                                                     name="file-upload"
                                                                     type="file"
