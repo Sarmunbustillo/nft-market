@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { FileReq } from '@_types/nft';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Session } from 'next-iron-session';
@@ -8,7 +9,6 @@ import {
     withSession,
 } from './utils';
 import FormData from 'form-data';
-import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 
 export default withSession(
@@ -17,19 +17,19 @@ export default withSession(
         res: NextApiResponse
     ) => {
         if (req.method === 'POST') {
-            const { bytes, contentType, fileName } = req.body as FileReq;
+            const { bytes, fileName, contentType } = req.body as FileReq;
 
-            if (!bytes || !contentType || !fileName) {
+            if (!bytes || !fileName || !contentType) {
                 return res
                     .status(422)
-                    .send({ message: 'Image data is missing' });
+                    .send({ message: 'Image data are missing' });
             }
 
             await addressCheckMiddleware(req, res);
 
             const buffer = Buffer.from(Object.values(bytes));
-
             const formData = new FormData();
+
             formData.append('file', buffer, {
                 contentType,
                 filename: fileName + '-' + uuidv4(),

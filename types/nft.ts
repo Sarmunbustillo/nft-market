@@ -30,7 +30,7 @@ export type FileReq = {
 };
 
 export type PinataRes = {
-    IpFsHash: string;
+    IpfsHash: string;
     PinSize: number;
     Timestamp: string;
     isDuplicate: boolean;
