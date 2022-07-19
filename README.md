@@ -19,3 +19,11 @@ Run `sudo truffle console` to enter the truffle console to run commands
 Run `sudo truffle test` for testing
 
 Run `pnpm run genContractType` to generate contract types
+
+## Production deploying to Ropsten network
+
+Create a new project in https://infura.io/
+
+You can add Eth to your Robsten enviroment here https://faucet.egorfine.com/ pasting your address
+
+Run `sudo truffle migrate --network ropsten` to migrate contracts to ropsten network

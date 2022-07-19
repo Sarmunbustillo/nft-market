@@ -43,7 +43,7 @@ const Walletbar: FunctionComponent<WalletbarProps> = ({
                         <span className="sr-only">Open user menu</span>
                         <img
                             className="h-8 w-8 rounded-full"
-                            src="/images/funtado.svg"
+                            src="/images/default_avatar.png"
                             alt=""
                         />
                     </Menu.Button>

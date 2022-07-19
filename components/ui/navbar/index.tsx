@@ -46,11 +46,9 @@ export default function Navbar() {
                             </div>
                             <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
                                 <div className="flex-shrink-0 flex items-center">
-                                    <img
-                                        className="hidden lg:block h-10 w-auto"
-                                        src="/images/page_logo.png"
-                                        alt="Workflow"
-                                    />
+                                    <h1 className=" hidden text-2xl tracking-tight font-extrabold text-gray-100 sm:block">
+                                        NFT-market
+                                    </h1>
                                 </div>
                                 <div className="hidden sm:block sm:ml-6">
                                     <div className="flex space-x-4">

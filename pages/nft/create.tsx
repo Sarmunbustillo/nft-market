@@ -153,9 +153,9 @@ const NftCreate: NextPage = () => {
             );
 
             await toast.promise(transaccion!.wait(), {
-                pending: 'Creating NFT',
-                success: 'NFT created',
-                error: 'Could not create NFT',
+                pending: 'Minting NFT token',
+                success: 'NFT has been created',
+                error: 'Minting NFT Error',
             });
 
             alert('NFT was created');

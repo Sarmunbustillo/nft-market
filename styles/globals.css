@@ -18,3 +18,8 @@ a {
 * {
     box-sizing: border-box;
 }
+
+.Toastify__spinner {
+    border-color: var(--toastify-spinner-color-empty-area) !important;
+    border-right-color: var(--toastify-spinner-color) !important;
+}
