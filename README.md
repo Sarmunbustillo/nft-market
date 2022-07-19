@@ -1,6 +1,6 @@
 # NFT market place app
 
-Buy, sell and transfer Nfts
+Buy, sell and transfer NFTs
 
 ## Tech
 
@@ -8,7 +8,9 @@ React, Nextjs, Typescript, Tailwind, Ganache, Truffle, Pinata nft cloud
 
 ## Development
 
-You need to install Ganache and Truffle for blockchain enviroment (and have Ganache open) (default account is always the first one accounts[0])
+You need Metamask and an account.
+
+Install Ganache and Truffle for blockchain enviroment (and have Ganache opened) (default account is always the first one accounts[0])
 
 you can import a Ganache account **private key** into your metaMask for testing
 
