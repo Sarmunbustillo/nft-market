@@ -20,10 +20,14 @@ Run `sudo truffle test` for testing
 
 Run `pnpm run genContractType` to generate contract types
 
-## Production deploying to Ropsten network
+## Deploying to Ropsten network
 
 Create a new project in https://infura.io/
 
-You can add Eth to your Robsten enviroment here https://faucet.egorfine.com/ pasting your address
+You can add Eth to your Robsten enviroment here https://faucet.egorfine.com/ pasting your wallet address
 
 Run `sudo truffle migrate --network ropsten` to migrate contracts to ropsten network
+
+## Deploying to Vercel
+
+add your enviromental variables to deploy
